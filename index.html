@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hey Rowen — Viaja Sin Filtros</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sand:     #F2E8D9;
+            --parchment:#EDE0CC;
+            --ember:    #D95F2B;
+            --ember-dk: #B8461A;
+            --ember-lt: #F08050;
+            --gold:     #E8A230;
+            --dusk:     #7A4F3A;
+            --soil:     #2E1B0E;
+            --fog:      #C4B5A5;
+            --moss:     #5C6B45;
+            --sky:      #C8DDEA;
+            --white:    #FBF8F4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background: var(--white);
+            color: var(--soil);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.028;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px;
+        }
+
+        /* NAV */
+        header {
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 1.6rem 4rem;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.5s ease;
+        }
+
+        header.scrolled {
+            background: rgba(242, 232, 217, 0.94);
+            backdrop-filter: blur(18px);
+            padding: 1rem 4rem;
+            box-shadow: 0 1px 0 var(--parchment);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800; font-size: 1.55rem;
+            color: white; letter-spacing: -0.5px;
+            transition: color 0.5s ease;
+        }
+
+        header.scrolled .logo { color: var(--ember); }
+
+        .nav-links {
+            list-style: none; display: flex;
+            gap: 2.4rem; align-items: center;
+        }
+
+        .nav-links > li { position: relative; }
+
+        .nav-links a {
+            text-decoration: none;
+            color: rgba(255,255,255,0.88);
+            font-weight: 600; font-size: 0.82rem;
+            letter-spacing: 1.2px; text-transform: uppercase;
+            transition: color 0.3s;
+            display: flex; align-items: center; gap: 0.3rem;
+            cursor: pointer;
+        }
+
+        header.scrolled .nav-links a { color: var(--dusk); }
+        .nav-links a:hover { color: var(--gold) !important; }
+
+        .dropdown-arrow { font-size: 0.5rem; transition: transform 0.3s; }
+        .nav-links li:hover .dropdown-arrow { transform: rotate(180deg); }
+
+        .dropdown {
+            position: absolute; top: calc(100% + 1.4rem); left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: var(--white); border-radius: 10px;
+            box-shadow: 0 12px 40px rgba(46,27,14,0.14);
+            border: 1px solid var(--parchment);
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            padding: 0.5rem 0; min-width: 200px;
+        }
+
+        .nav-links li:hover > .dropdown {
+            opacity: 1; visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .continent-item {
+            position: relative; padding: 0.7rem 1.3rem;
+            transition: background 0.2s;
+        }
+
+        .continent-item:hover { background: var(--sand); }
+
+        .continent-link {
+            display: flex; align-items: center; justify-content: space-between;
+            text-decoration: none;
+            color: var(--soil) !important; font-weight: 600 !important;
+            font-size: 0.85rem !important; letter-spacing: 0.3px !important;
+            text-transform: none !important;
+        }
+
+        .continent-emoji {
+            margin-right: 0.5rem; font-size: 1rem;
+            display: inline-block; width: 22px; height: 22px;
+            border-radius: 4px; overflow: hidden;
+            vertical-align: middle; flex-shrink: 0;
+        }
+
+        .continent-emoji img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            display: block;
+        }
+        .continent-arrow { font-size: 0.6rem; color: var(--ember); transition: transform 0.2s; }
+        .continent-item:hover .continent-arrow { transform: translateX(3px); }
+
+        .countries-dropdown {
+            position: absolute; top: 0; left: 100%; margin-left: 0.4rem;
+            background: var(--white); border-radius: 10px;
+            box-shadow: 0 12px 40px rgba(46,27,14,0.14);
+            border: 1px solid var(--parchment);
+            opacity: 0; visibility: hidden;
+            transform: translateX(-8px);
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            padding: 0.5rem 0; min-width: 170px;
+        }
+
+        .continent-item:hover .countries-dropdown {
+            opacity: 1; visibility: visible; transform: translateX(0);
+        }
+
+        .country-item { padding: 0.5rem 1.3rem; transition: background 0.2s; }
+        .country-item:hover { background: var(--sand); }
+
+        .country-item a {
+            color: var(--fog) !important; font-weight: 400 !important;
+            font-size: 0.85rem !important; text-transform: none !important;
+            letter-spacing: 0 !important; text-decoration: none;
+            display: block; transition: all 0.2s;
+        }
+
+        .country-item:hover a { color: var(--ember) !important; padding-left: 4px; }
+
+        /* HERO */
+        .hero {
+            height: 100vh; min-height: 700px;
+            position: relative;
+            display: flex; align-items: flex-end;
+            padding: 0 4rem 7rem;
+            background: url('images/portada.jpg') center/cover no-repeat;
+            background-color: #6B4A35;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(160deg,
+                rgba(46,27,14,0.15) 0%,
+                rgba(217,95,43,0.22) 50%,
+                rgba(46,27,14,0.75) 100%
+            );
+        }
+
+        .hero::after {
+            content: ''; position: absolute;
+            bottom: -120px; right: -80px;
+            width: 600px; height: 600px;
+            border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+            background: radial-gradient(circle, rgba(232,162,48,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content { position: relative; z-index: 2; max-width: 900px; }
+
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            background: rgba(232,162,48,0.18);
+            border: 1px solid rgba(232,162,48,0.4);
+            color: var(--gold); font-size: 0.72rem;
+            font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+            padding: 0.45rem 1rem; border-radius: 100px;
+            margin-bottom: 1.6rem; backdrop-filter: blur(8px);
+            animation: fadeSlide 0.8s ease 0.2s both;
+        }
+
+        .hero-tag::before {
+            content: ''; width: 6px; height: 6px;
+            background: var(--gold); border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.7); }
+        }
+
+        .hero h1 {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(3.5rem, 8vw, 7.5rem);
+            font-weight: 700; line-height: 0.95;
+            color: white; letter-spacing: -3px;
+            margin-bottom: 1.8rem;
+            animation: fadeSlide 0.8s ease 0.4s both;
+        }
+
+        .hero h1 .italic-line {
+            font-style: italic; color: var(--gold); display: block;
+        }
+
+        .hero-bottom {
+            display: flex; align-items: flex-end;
+            justify-content: space-between; gap: 2rem;
+            animation: fadeSlide 0.8s ease 0.65s both;
+        }
+
+        .hero-desc {
+            max-width: 420px; color: rgba(255,255,255,0.75);
+            font-size: 1rem; line-height: 1.8; font-weight: 400;
+        }
+
+        .hero-actions { display: flex; gap: 1rem; flex-shrink: 0; }
+
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 0.7rem;
+            background: var(--ember); color: white;
+            text-decoration: none; padding: 1rem 2rem;
+            border-radius: 100px; font-size: 0.85rem;
+            font-weight: 600; letter-spacing: 0.5px;
+            transition: all 0.3s ease; white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            background: var(--gold); color: var(--soil);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(217,95,43,0.4);
+        }
+
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white; text-decoration: none;
+            padding: 1rem 2rem; border-radius: 100px;
+            font-size: 0.85rem; font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease; white-space: nowrap;
+        }
+
+        .btn-secondary:hover { background: rgba(255,255,255,0.22); transform: translateY(-3px); }
+
+        .scroll-hint {
+            position: absolute; bottom: 2.5rem; left: 50%;
+            transform: translateX(-50%); z-index: 2;
+            display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+            color: rgba(255,255,255,0.45); font-size: 0.68rem;
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        .scroll-line {
+            width: 1px; height: 40px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.45), transparent);
+            animation: scrollDrop 1.8s ease infinite;
+        }
+
+        @keyframes scrollDrop {
+            0%   { transform: scaleY(0); transform-origin: top; opacity: 0; }
+            50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+            100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* VIBE MARQUEE */
+        .vibe-strip { background: var(--ember); overflow: hidden; }
+
+        .vibe-track {
+            display: flex; gap: 0;
+            white-space: nowrap;
+            animation: marquee 22s linear infinite;
+            width: max-content; padding: 1rem 0;
+        }
+
+        .vibe-track:hover { animation-play-state: paused; }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        .vibe-item {
+            display: inline-flex; align-items: center; gap: 1rem;
+            color: rgba(255,255,255,0.9); font-size: 0.8rem;
+            font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+            padding: 0 2.5rem;
+        }
+
+        .vibe-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.45); }
+
+        /* POSTS */
+        .posts-section { max-width: 1320px; margin: 7rem auto; padding: 0 4rem; }
+
+        .section-eyebrow { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .eyebrow-line { width: 40px; height: 2px; background: var(--ember); }
+        .eyebrow-text { font-size: 0.72rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--ember); }
+
+        .section-title {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2rem, 3.5vw, 3rem);
+            font-weight: 700; color: var(--soil);
+            line-height: 1.1; letter-spacing: -1px; margin-bottom: 3.5rem;
+        }
+
+        .section-title em { font-style: italic; color: var(--ember); }
+
+        .posts-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 1.2rem;
+        }
+
+        .post-card {
+            border-radius: 12px; overflow: hidden;
+            cursor: pointer; position: relative;
+            transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease;
+            background: var(--sand);
+        }
+
+        .post-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(46,27,14,0.15); }
+        .post-card.main-card { grid-row: span 2; }
+
+        .post-img { width: 100%; position: relative; overflow: hidden; background: var(--parchment); }
+        .main-card .post-img { height: 420px; }
+        .post-card:not(.main-card) .post-img { height: 180px; }
+
+        .post-img-inner {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 5rem; transition: transform 0.7s ease;
+            overflow: hidden;
+        }
+
+        .post-img-inner img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            display: block;
+        }
+
+        .post-card:hover .post-img-inner { transform: scale(1.08); }
+
+        .img-beach { background: linear-gradient(135deg, #F0C27F 0%, #F08050 40%, #D95F2B 100%); }
+        .img-camp  { background: linear-gradient(135deg, #8FB88A 0%, #C8A96E 60%, #E8A230 100%); }
+        .img-city  { background: linear-gradient(135deg, #D4A56A 0%, #C8DDEA 100%); }
+
+        .post-pill {
+            position: absolute; top: 1rem; left: 1rem;
+            background: rgba(46,27,14,0.65); backdrop-filter: blur(8px);
+            color: var(--gold); font-size: 0.65rem; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            padding: 0.4rem 0.9rem; border-radius: 100px;
+            border: 1px solid rgba(232,162,48,0.3);
+        }
+
+        .post-body { padding: 1.6rem 1.8rem 1.8rem; }
+        .main-card .post-body { padding: 2rem 2.2rem 2.2rem; }
+
+        .post-meta { color: var(--fog); font-size: 0.75rem; font-weight: 500; margin-bottom: 0.7rem; }
+
+        .post-title {
+            font-family: 'Fraunces', serif; font-weight: 700;
+            color: var(--soil); line-height: 1.2;
+            margin-bottom: 0.8rem; letter-spacing: -0.4px;
+        }
+
+        .main-card .post-title { font-size: 1.8rem; }
+        .post-card:not(.main-card) .post-title { font-size: 1.1rem; }
+
+        .post-excerpt { color: var(--dusk); font-size: 0.92rem; line-height: 1.75; margin-bottom: 1.4rem; font-weight: 400; }
+        .post-card:not(.main-card) .post-excerpt { display: none; }
+
+        .post-read {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            color: var(--ember); font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 0.5px; text-decoration: none;
+            transition: gap 0.2s;
+        }
+
+        .post-read:hover { gap: 0.9rem; }
+
+        /* DESTINATIONS */
+        .destinations-section {
+            background: var(--soil); padding: 6rem 4rem;
+            position: relative; overflow: hidden;
+        }
+
+        .destinations-section::before {
+            content: ''; position: absolute;
+            top: -100px; right: -100px;
+            width: 500px; height: 500px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(217,95,43,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .destinations-inner { max-width: 1320px; margin: 0 auto; }
+
+        .destinations-section .eyebrow-text { color: var(--gold); }
+        .destinations-section .eyebrow-line { background: var(--gold); }
+        .destinations-section .section-title { color: white; }
+        .destinations-section .section-title em { color: var(--ember-lt); }
+
+        .dest-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 1rem; margin-top: 3.5rem;
+        }
+
+        .dest-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 2.2rem 1.5rem;
+            text-align: center; text-decoration: none;
+            display: block; transition: all 0.35s ease;
+            position: relative; overflow: hidden;
+        }
+
+        .dest-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(217,95,43,0.12), transparent);
+            opacity: 0; transition: opacity 0.3s;
+        }
+
+        .dest-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(232,162,48,0.35); transform: translateY(-5px); }
+        .dest-card:hover::before { opacity: 1; }
+
+        .dest-emoji {
+            font-size: 2.8rem; display: block; margin-bottom: 0.9rem;
+            width: 64px; height: 64px; margin-left: auto; margin-right: auto;
+            border-radius: 50%; overflow: hidden;
+        }
+
+        .dest-emoji img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            display: block;
+        }
+
+        .dest-name { font-family: 'Fraunces', serif; font-size: 1.05rem; font-weight: 700; color: white; display: block; margin-bottom: 0.35rem; }
+        .dest-count { font-size: 0.72rem; color: rgba(255,255,255,0.35); font-weight: 500; letter-spacing: 0.5px; }
+
+        /* MANIFESTO */
+        .manifesto {
+            max-width: 1320px; margin: 7rem auto; padding: 0 4rem;
+            display: grid; grid-template-columns: 1fr 1.1fr;
+            gap: 6rem; align-items: center;
+        }
+
+        .manifesto-quote {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2rem, 3.5vw, 2.8rem);
+            font-weight: 300; font-style: italic;
+            color: var(--soil); line-height: 1.3; letter-spacing: -0.5px;
+            margin-bottom: 2rem;
+            padding-left: 1.8rem;
+            border-left: 3px solid var(--ember);
+        }
+
+        .manifesto-quote strong { font-weight: 700; font-style: normal; color: var(--ember); }
+
+        .manifesto-body { color: var(--dusk); font-size: 0.97rem; line-height: 1.9; margin-bottom: 2rem; font-weight: 400; }
+
+        .manifesto-link {
+            display: inline-flex; align-items: center; gap: 0.7rem;
+            color: var(--ember); font-weight: 700; font-size: 0.85rem;
+            letter-spacing: 0.5px; text-decoration: none;
+            border-bottom: 2px solid var(--ember); padding-bottom: 3px;
+            transition: gap 0.2s, color 0.2s;
+        }
+
+        .manifesto-link:hover { gap: 1.1rem; color: var(--ember-dk); }
+
+        .manifesto-visual {
+            display: grid; grid-template-columns: 1fr 1fr;
+            grid-template-rows: 260px 160px; gap: 0.8rem;
+        }
+
+        .mosaic-block {
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3.5rem; overflow: hidden;
+        }
+
+        .mosaic-block img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            display: block;
+        }
+
+        .mosaic-block:first-child { grid-row: span 2; font-size: 5rem; background: linear-gradient(160deg, #E8A230 0%, #D95F2B 60%, #7A4F3A 100%); }
+        .mosaic-block:nth-child(2) { background: linear-gradient(135deg, #8FB88A 0%, #C8A96E 100%); }
+        .mosaic-block:nth-child(3) { background: linear-gradient(135deg, #C8DDEA 0%, #8FB88A 100%); }
+
+        .stats-row { display: flex; gap: 1.5rem; margin-top: 2rem; }
+
+        .stat { background: var(--sand); border-radius: 10px; padding: 1.2rem 1.5rem; flex: 1; text-align: center; }
+        .stat-num { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 700; color: var(--ember); line-height: 1; }
+        .stat-label { font-size: 0.72rem; color: var(--fog); font-weight: 600; letter-spacing: 0.5px; margin-top: 0.3rem; text-transform: uppercase; }
+
+        /* FOOTER */
+        footer { background: var(--soil); padding: 5rem 4rem 2.5rem; }
+
+        .footer-inner { max-width: 1320px; margin: 0 auto; }
+
+        .footer-top {
+            display: grid; grid-template-columns: 1.8fr 1fr 1fr;
+            gap: 5rem; padding-bottom: 3.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 2.5rem;
+        }
+
+        .footer-logo { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--ember-lt); margin-bottom: 0.8rem; }
+
+        .footer-tagline { font-family: 'Fraunces', serif; font-style: italic; font-size: 1rem; color: rgba(255,255,255,0.4); line-height: 1.7; }
+
+        .footer-col h4 { font-size: 0.68rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 1.3rem; }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 0.7rem; }
+        .footer-col ul li a { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.88rem; font-weight: 400; transition: color 0.2s; }
+        .footer-col ul li a:hover { color: var(--ember-lt); }
+
+        .footer-bottom { text-align: center; font-size: 0.78rem; color: rgba(255,255,255,0.2); letter-spacing: 0.5px; }
+
+        /* REVEAL */
+        .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.75s ease, transform 0.75s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal:nth-child(2) { transition-delay: 0.1s; }
+        .reveal:nth-child(3) { transition-delay: 0.2s; }
+        .reveal:nth-child(4) { transition-delay: 0.3s; }
+        .reveal:nth-child(5) { transition-delay: 0.4s; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1100px) {
+            .dest-grid { grid-template-columns: repeat(3, 1fr); }
+            .posts-grid { grid-template-columns: 1fr; }
+            .post-card.main-card { grid-row: span 1; }
+            .post-card:not(.main-card) .post-excerpt { display: block; }
+            .manifesto { grid-template-columns: 1fr; gap: 3.5rem; }
+            .footer-top { grid-template-columns: 1fr 1fr; gap: 3rem; }
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 1.2rem 1.5rem; }
+            header.scrolled { padding: 0.9rem 1.5rem; }
+            .nav-links { display: none; }
+            .hero { padding: 0 1.8rem 5rem; min-height: 100svh; }
+            .hero-bottom { flex-direction: column; align-items: flex-start; }
+            .posts-section { padding: 0 1.5rem; margin: 5rem auto; }
+            .destinations-section { padding: 4rem 1.5rem; }
+            .dest-grid { grid-template-columns: repeat(2, 1fr); }
+            .manifesto { padding: 0 1.5rem; margin: 5rem auto; }
+            .manifesto-visual { grid-template-rows: 200px 120px; }
+            footer { padding: 4rem 1.5rem 2rem; }
+            .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+            .stats-row { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="mainHeader">
+        <div class="logo">Hey Rowen</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li>
+                <a>Destinos <span class="dropdown-arrow">▾</span></a>
+                <div class="dropdown">
+                    <div class="continent-item">
+                        <a href="europa.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-europa.jpg" alt="Europa"></span>Europa</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="espana.html">España</a></div>
+                            <div class="country-item"><a href="francia.html">Francia</a></div>
+                            <div class="country-item"><a href="italia.html">Italia</a></div>
+                            <div class="country-item"><a href="portugal.html">Portugal</a></div>
+                            <div class="country-item"><a href="grecia.html">Grecia</a></div>
+                        </div>
+                    </div>
+                    <div class="continent-item">
+                        <a href="america.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-america.jpg" alt="América"></span>América</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="mexico.html">México</a></div>
+                            <div class="country-item"><a href="estados-unidos.html">Estados Unidos</a></div>
+                            <div class="country-item"><a href="canada.html">Canadá</a></div>
+                            <div class="country-item"><a href="peru.html">Perú</a></div>
+                            <div class="country-item"><a href="argentina.html">Argentina</a></div>
+                        </div>
+                    </div>
+                    <div class="continent-item">
+                        <a href="asia.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-asia.jpg" alt="Asia"></span>Asia</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="japon.html">Japón</a></div>
+                            <div class="country-item"><a href="tailandia.html">Tailandia</a></div>
+                            <div class="country-item"><a href="vietnam.html">Vietnam</a></div>
+                            <div class="country-item"><a href="india.html">India</a></div>
+                        </div>
+                    </div>
+                    <div class="continent-item">
+                        <a href="africa.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-africa.jpg" alt="África"></span>África</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="marruecos.html">Marruecos</a></div>
+                            <div class="country-item"><a href="egipto.html">Egipto</a></div>
+                            <div class="country-item"><a href="sudafrica.html">Sudáfrica</a></div>
+                        </div>
+                    </div>
+                    <div class="continent-item">
+                        <a href="oceania.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-oceania.jpg" alt="Oceanía"></span>Oceanía</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="australia.html">Australia</a></div>
+                            <div class="country-item"><a href="nueva-zelanda.html">Nueva Zelanda</a></div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-tag">✦ Blog de viajeros reales</div>
+            <h1>
+                El mundo<br>
+                <span class="italic-line">te está llamando.</span>
+            </h1>
+            <div class="hero-bottom">
+                <p class="hero-desc">Destinos cálidos, rutas auténticas y experiencias sin filtros para los que viajan de verdad. Bienvenido a Hey Rowen.</p>
+                <div class="hero-actions">
+                    <a href="#posts" class="btn-primary">Ver artículos ↓</a>
+                    <a href="nosotros.html" class="btn-secondary">Quiénes somos</a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-hint">
+            <div class="scroll-line"></div>
+            scroll
+        </div>
+    </section>
+
+    <div class="vibe-strip">
+        <div class="vibe-track">
+            <span class="vibe-item">Aventura auténtica <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Destinos cálidos <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Rutas sin filtros <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Cultura local <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Viajes que transforman <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Libertad total <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Aventura auténtica <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Destinos cálidos <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Rutas sin filtros <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Cultura local <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Viajes que transforman <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Libertad total <span class="vibe-dot"></span></span>
+        </div>
+    </div>
+
+    <section class="posts-section" id="posts">
+        <div class="section-eyebrow reveal">
+            <div class="eyebrow-line"></div>
+            <span class="eyebrow-text">Últimas entradas</span>
+        </div>
+        <h2 class="section-title reveal">Lo que <em>no te puedes perder</em></h2>
+
+        <div class="posts-grid">
+            <article class="post-card main-card reveal">
+                <div class="post-img">
+                    <div class="post-img-inner img-beach">
+                        <img src="images/post-playas.jpg" alt="Las mejores playas de España">
+                    </div>
+                    <span class="post-pill">Playas</span>
+                </div>
+                <div class="post-body">
+                    <div class="post-meta">15 Enero 2026 · 8 min lectura</div>
+                    <h3 class="post-title">Las Mejores Playas de España para Perderse este Verano</h3>
+                    <p class="post-excerpt">Calas escondidas, aguas turquesa y pueblos que te roban el alma. Una guía sin filtros para los que buscan algo más que una tumbona.</p>
+                    <a href="#" class="post-read">Leer el artículo →</a>
+                </div>
+            </article>
+
+            <article class="post-card reveal">
+                <div class="post-img">
+                    <div class="post-img-inner img-camp">
+                        <img src="images/post-camping.jpg" alt="Camping salvaje">
+                    </div>
+                    <span class="post-pill">Aventura</span>
+                </div>
+                <div class="post-body">
+                    <div class="post-meta">12 Enero 2026 · 10 min lectura</div>
+                    <h3 class="post-title">Camping Salvaje: La Guía que Nadie Te Cuenta</h3>
+                    <a href="#" class="post-read">Leer →</a>
+                </div>
+            </article>
+
+            <article class="post-card reveal">
+                <div class="post-img">
+                    <div class="post-img-inner img-city">
+                        <img src="images/post-marrakech.jpg" alt="Marrakech">
+                    </div>
+                    <span class="post-pill">Cultura</span>
+                </div>
+                <div class="post-body">
+                    <div class="post-meta">8 Enero 2026 · 12 min lectura</div>
+                    <h3 class="post-title">48h en Marrakech: Cómo Vivirla Como un Local</h3>
+                    <a href="#" class="post-read">Leer →</a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="destinations-section">
+        <div class="destinations-inner">
+            <div class="section-eyebrow reveal">
+                <div class="eyebrow-line"></div>
+                <span class="eyebrow-text">Explorar</span>
+            </div>
+            <h2 class="section-title reveal">El mundo, <em>por continentes</em></h2>
+            <div class="dest-grid">
+                <a href="europa.html" class="dest-card reveal"><span class="dest-emoji"><img src="images/dest-europa.jpg" alt="Europa"></span><span class="dest-name">Europa</span><span class="dest-count">5 países</span></a>
+                <a href="america.html" class="dest-card reveal"><span class="dest-emoji"><img src="images/dest-america.jpg" alt="América"></span><span class="dest-name">América</span><span class="dest-count">5 países</span></a>
+                <a href="asia.html" class="dest-card reveal"><span class="dest-emoji"><img src="images/dest-asia.jpg" alt="Asia"></span><span class="dest-name">Asia</span><span class="dest-count">4 países</span></a>
+                <a href="africa.html" class="dest-card reveal"><span class="dest-emoji"><img src="images/dest-africa.jpg" alt="África"></span><span class="dest-name">África</span><span class="dest-count">3 países</span></a>
+                <a href="oceania.html" class="dest-card reveal"><span class="dest-emoji"><img src="images/dest-oceania.jpg" alt="Oceanía"></span><span class="dest-name">Oceanía</span><span class="dest-count">2 países</span></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="manifesto">
+        <div class="manifesto-text reveal">
+            <div class="section-eyebrow" style="margin-bottom:1rem">
+                <div class="eyebrow-line"></div>
+                <span class="eyebrow-text">Quiénes somos</span>
+            </div>
+            <blockquote class="manifesto-quote">
+                Viajar no es un lujo.<br>
+                Es <strong>una forma de vivir.</strong>
+            </blockquote>
+            <p class="manifesto-body">Hey Rowen nació de mochila al hombro y pasaporte en mano. Escribimos sobre los sitios que nos han movido el piso — mercados llenos de especias, amaneceres en la montaña, playas que no salen en las guías. Sin patrocinios, sin postureo. Solo viajes reales.</p>
+            <a href="nosotros.html" class="manifesto-link">Nuestra historia →</a>
+            <div class="stats-row">
+                <div class="stat"><div class="stat-num">+50</div><div class="stat-label">Artículos</div></div>
+                <div class="stat"><div class="stat-num">17</div><div class="stat-label">Países</div></div>
+                <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Sin filtros</div></div>
+            </div>
+        </div>
+        <div class="manifesto-visual reveal">
+            <div class="mosaic-block"><img src="images/atardecer_portada.jpg" alt="Atardecer"></div>
+            <div class="mosaic-block"><img src="images/montana_portada.jpg" alt="Montaña"></div>
+            <div class="mosaic-block"><img src="images/mar_portada.jpg" alt="Mar"></div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div>
+                    <div class="footer-logo">Hey Rowen</div>
+                    <p class="footer-tagline">Viaja sin filtros.<br>El mundo te está esperando. ✦</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Destinos</h4>
+                    <ul>
+                        <li><a href="europa.html">Europa</a></li>
+                        <li><a href="america.html">América</a></li>
+                        <li><a href="asia.html">Asia</a></li>
+                        <li><a href="africa.html">África</a></li>
+                        <li><a href="oceania.html">Oceanía</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Blog</h4>
+                    <ul>
+                        <li><a href="nosotros.html">Nosotros</a></li>
+                        <li><a href="contacto.html">Contacto</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">&copy; 2026 Hey Rowen — Todos los derechos reservados</div>
+        </div>
+    </footer>
+
+    <script>
+        const header = document.getElementById('mainHeader');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 60);
+        }, { passive: true });
+
+        const reveals = document.querySelectorAll('.reveal');
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.1 });
+        reveals.forEach(el => io.observe(el));
+    </script>
+</body>
+</html>
