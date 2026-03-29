@@ -634,9 +634,30 @@
                 display: flex; width: 100%;
             }
 
-            /* Hide nested dropdowns on mobile — links go straight to page */
+            /* Hide nested dropdowns on mobile — accordion replaces hover */
             .dropdown, .countries-dropdown { display: none !important; }
-            .dropdown-arrow { display: none; }
+            .dropdown-arrow { display: inline !important; transition: transform 0.3s; }
+
+            /* Accordion: show dropdown when toggled */
+            .nav-links.open .dropdown.show-mobile {
+                display: block !important;
+                position: static;
+                transform: none;
+                box-shadow: none;
+                border: none;
+                opacity: 1;
+                visibility: visible;
+                padding-left: 1.5rem;
+                background: var(--sand);
+                border-radius: 0;
+                min-width: unset;
+            }
+
+            /* Hide country sub-dropdowns inside the accordion */
+            .nav-links.open .dropdown.show-mobile .countries-dropdown { display: none !important; }
+
+            /* Rotate arrow when open */
+            #toggleDestinosMobile.active .dropdown-arrow { transform: rotate(180deg); }
 
             /* HERO */
             .hero { padding: 0 1.4rem 4.5rem; min-height: 100svh; }
@@ -684,7 +705,7 @@
         <ul class="nav-links" id="navLinks">
             <li><a href="index.html">Home</a></li>
             <li>
-                <a>Destinos <span class="dropdown-arrow">▾</span></a>
+                <a id="toggleDestinosMobile">Destinos <span class="dropdown-arrow">▾</span></a>
                 <div class="dropdown">
                     <div class="continent-item">
                         <a href="europa.html" class="continent-link">
@@ -948,7 +969,17 @@
 
         overlay.addEventListener('click', () => toggleMenu(false));
 
-        // Close menu on nav link click
+        // Acordeón de Destinos en móvil
+        const destinosBtn = document.getElementById('toggleDestinosMobile');
+        const dropdown = document.querySelector('.dropdown');
+
+        destinosBtn.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                dropdown.classList.toggle('show-mobile');
+                destinosBtn.classList.toggle('active');
+            }
+        });
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => toggleMenu(false));
         });
