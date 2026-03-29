@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Europa — Hey Rowen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sand:     #F2E8D9;
+            --parchment:#EDE0CC;
+            --ember:    #D95F2B;
+            --ember-dk: #B8461A;
+            --ember-lt: #F08050;
+            --gold:     #E8A230;
+            --dusk:     #7A4F3A;
+            --soil:     #2E1B0E;
+            --fog:      #C4B5A5;
+            --moss:     #5C6B45;
+            --sky:      #C8DDEA;
+            --white:    #FBF8F4;
+            /* Europa accent */
+            --europa:     #2E6DA4;
+            --europa-lt:  #5A9FD4;
+            --europa-dk:  #1A4A72;
+            --europa-gold:#E8A230;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background: var(--white);
+            color: var(--soil);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.028;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px;
+        }
+
+        /* NAV */
+        header {
+            position: fixed; top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 1.6rem 4rem;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.5s ease;
+        }
+
+        header.scrolled {
+            background: rgba(242, 232, 217, 0.94);
+            backdrop-filter: blur(18px);
+            padding: 1rem 4rem;
+            box-shadow: 0 1px 0 var(--parchment);
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800; font-size: 1.55rem;
+            color: white; letter-spacing: -0.5px;
+            transition: color 0.5s ease;
+            text-decoration: none;
+        }
+
+        header.scrolled .logo { color: var(--ember); }
+
+        .nav-links {
+            list-style: none; display: flex;
+            gap: 2.4rem; align-items: center;
+        }
+
+        .nav-links > li { position: relative; }
+
+        .nav-links a {
+            text-decoration: none;
+            color: rgba(255,255,255,0.88);
+            font-weight: 600; font-size: 0.82rem;
+            letter-spacing: 1.2px; text-transform: uppercase;
+            transition: color 0.3s;
+            display: flex; align-items: center; gap: 0.3rem;
+            cursor: pointer;
+        }
+
+        header.scrolled .nav-links a { color: var(--dusk); }
+        .nav-links a:hover { color: var(--gold) !important; }
+
+        .dropdown-arrow { font-size: 0.5rem; transition: transform 0.3s; }
+        .nav-links li:hover .dropdown-arrow { transform: rotate(180deg); }
+
+        .dropdown {
+            position: absolute; top: calc(100% + 1.4rem); left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            background: var(--white); border-radius: 10px;
+            box-shadow: 0 12px 40px rgba(46,27,14,0.14);
+            border: 1px solid var(--parchment);
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            padding: 0.5rem 0; min-width: 200px;
+        }
+
+        .nav-links li:hover > .dropdown {
+            opacity: 1; visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .continent-item {
+            position: relative; padding: 0.7rem 1.3rem;
+            transition: background 0.2s;
+        }
+
+        .continent-item:hover { background: var(--sand); }
+
+        .continent-link {
+            display: flex; align-items: center; justify-content: space-between;
+            text-decoration: none;
+            color: var(--soil) !important; font-weight: 600 !important;
+            font-size: 0.85rem !important; letter-spacing: 0.3px !important;
+            text-transform: none !important;
+        }
+
+        .continent-emoji {
+            margin-right: 0.5rem; font-size: 1rem;
+            display: inline-block; width: 22px; height: 22px;
+            border-radius: 4px; overflow: hidden;
+            vertical-align: middle; flex-shrink: 0;
+        }
+
+        .continent-emoji img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            display: block;
+        }
+        .continent-arrow { font-size: 0.6rem; color: var(--ember); transition: transform 0.2s; }
+        .continent-item:hover .continent-arrow { transform: translateX(3px); }
+
+        .countries-dropdown {
+            position: absolute; top: 0; left: 100%; margin-left: 0.4rem;
+            background: var(--white); border-radius: 10px;
+            box-shadow: 0 12px 40px rgba(46,27,14,0.14);
+            border: 1px solid var(--parchment);
+            opacity: 0; visibility: hidden;
+            transform: translateX(-8px);
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            padding: 0.5rem 0; min-width: 170px;
+        }
+
+        .continent-item:hover .countries-dropdown {
+            opacity: 1; visibility: visible; transform: translateX(0);
+        }
+
+        .country-item { padding: 0.5rem 1.3rem; transition: background 0.2s; }
+        .country-item:hover { background: var(--sand); }
+
+        .country-item a {
+            color: var(--fog) !important; font-weight: 400 !important;
+            font-size: 0.85rem !important; text-transform: none !important;
+            letter-spacing: 0 !important; text-decoration: none;
+            display: block; transition: all 0.2s;
+        }
+
+        .country-item:hover a { color: var(--ember) !important; padding-left: 4px; }
+
+        /* HERO */
+        .hero {
+            height: 100vh; min-height: 700px;
+            position: relative;
+            display: flex; align-items: flex-end;
+            padding: 0 4rem 7rem;
+            background: url('images/dest-europa.jpg') center/cover no-repeat;
+            background-color: #1A3A5C;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(160deg,
+                rgba(46,27,14,0.10) 0%,
+                rgba(46,109,164,0.20) 50%,
+                rgba(46,27,14,0.80) 100%
+            );
+        }
+
+        .hero::after {
+            content: ''; position: absolute;
+            bottom: -120px; right: -80px;
+            width: 600px; height: 600px;
+            border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%;
+            background: radial-gradient(circle, rgba(232,162,48,0.18) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content { position: relative; z-index: 2; max-width: 900px; }
+
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            background: rgba(46,109,164,0.22);
+            border: 1px solid rgba(90,159,212,0.45);
+            color: #A8D4F0; font-size: 0.72rem;
+            font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+            padding: 0.45rem 1rem; border-radius: 100px;
+            margin-bottom: 1.6rem; backdrop-filter: blur(8px);
+            animation: fadeSlide 0.8s ease 0.2s both;
+        }
+
+        .hero-tag::before {
+            content: ''; width: 6px; height: 6px;
+            background: #A8D4F0; border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.7); }
+        }
+
+        .hero h1 {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(3.5rem, 8vw, 7.5rem);
+            font-weight: 700; line-height: 0.95;
+            color: white; letter-spacing: -3px;
+            margin-bottom: 1.8rem;
+            animation: fadeSlide 0.8s ease 0.4s both;
+        }
+
+        .hero h1 .italic-line {
+            font-style: italic; color: #A8D4F0; display: block;
+        }
+
+        .hero-bottom {
+            display: flex; align-items: flex-end;
+            justify-content: space-between; gap: 2rem;
+            animation: fadeSlide 0.8s ease 0.65s both;
+        }
+
+        .hero-desc {
+            max-width: 420px; color: rgba(255,255,255,0.75);
+            font-size: 1rem; line-height: 1.8; font-weight: 400;
+        }
+
+        .hero-actions { display: flex; gap: 1rem; flex-shrink: 0; }
+
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 0.7rem;
+            background: var(--europa); color: white;
+            text-decoration: none; padding: 1rem 2rem;
+            border-radius: 100px; font-size: 0.85rem;
+            font-weight: 600; letter-spacing: 0.5px;
+            transition: all 0.3s ease; white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            background: var(--europa-gold); color: var(--soil);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(46,109,164,0.4);
+        }
+
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white; text-decoration: none;
+            padding: 1rem 2rem; border-radius: 100px;
+            font-size: 0.85rem; font-weight: 600;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease; white-space: nowrap;
+        }
+
+        .btn-secondary:hover { background: rgba(255,255,255,0.22); transform: translateY(-3px); }
+
+        .scroll-hint {
+            position: absolute; bottom: 2.5rem; left: 50%;
+            transform: translateX(-50%); z-index: 2;
+            display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+            color: rgba(255,255,255,0.45); font-size: 0.68rem;
+            letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        .scroll-line {
+            width: 1px; height: 40px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.45), transparent);
+            animation: scrollDrop 1.8s ease infinite;
+        }
+
+        @keyframes scrollDrop {
+            0%   { transform: scaleY(0); transform-origin: top; opacity: 0; }
+            50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+            100% { transform: scaleY(1); transform-origin: bottom; opacity: 0; }
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* VIBE MARQUEE */
+        .vibe-strip { background: var(--europa); overflow: hidden; }
+
+        .vibe-track {
+            display: flex; gap: 0;
+            white-space: nowrap;
+            animation: marquee 22s linear infinite;
+            width: max-content; padding: 1rem 0;
+        }
+
+        .vibe-track:hover { animation-play-state: paused; }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        .vibe-item {
+            display: inline-flex; align-items: center; gap: 1rem;
+            color: rgba(255,255,255,0.9); font-size: 0.8rem;
+            font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+            padding: 0 2.5rem;
+        }
+
+        .vibe-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.45); }
+
+        /* PAÍSES */
+        .countries-section {
+            max-width: 1320px; margin: 7rem auto; padding: 0 4rem;
+        }
+
+        .section-eyebrow { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .eyebrow-line { width: 40px; height: 2px; background: var(--europa); }
+        .eyebrow-text { font-size: 0.72rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--europa); }
+
+        .section-title {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2rem, 3.5vw, 3rem);
+            font-weight: 700; color: var(--soil);
+            line-height: 1.1; letter-spacing: -1px; margin-bottom: 3.5rem;
+        }
+
+        .section-title em { font-style: italic; color: var(--europa); }
+
+        /* COUNTRY CARDS */
+        .country-cards-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 1.2rem;
+        }
+
+        .country-card {
+            border-radius: 12px; overflow: hidden;
+            cursor: pointer; position: relative;
+            transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s ease;
+            background: var(--sand);
+        }
+
+        .country-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(46,27,14,0.15); }
+        .country-card.main-card { grid-row: span 2; }
+
+        .card-img { width: 100%; position: relative; overflow: hidden; background: var(--parchment); }
+        .main-card .card-img { height: 420px; }
+        .country-card:not(.main-card) .card-img { height: 180px; }
+
+        .card-img-inner {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.7s ease;
+            overflow: hidden;
+        }
+
+        .card-img-inner img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            display: block;
+        }
+
+        .country-card:hover .card-img-inner { transform: scale(1.08); }
+
+        .img-espana   { background: linear-gradient(135deg, #AA151B 0%, #F1BF00 50%, #AA151B 100%); }
+        .img-francia  { background: linear-gradient(135deg, #002395 0%, #FFFFFF 40%, #ED2939 100%); }
+        .img-italia   { background: linear-gradient(135deg, #009246 0%, #FFFFFF 40%, #CE2B37 100%); }
+        .img-portugal { background: linear-gradient(135deg, #006600 0%, #FF0000 50%, #003399 100%); }
+        .img-grecia   { background: linear-gradient(135deg, #0D5EAF 0%, #FFFFFF 40%, #0D5EAF 100%); }
+
+        .card-pill {
+            position: absolute; top: 1rem; left: 1rem;
+            background: rgba(46,27,14,0.65); backdrop-filter: blur(8px);
+            color: #A8D4F0; font-size: 0.65rem; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            padding: 0.4rem 0.9rem; border-radius: 100px;
+            border: 1px solid rgba(168,212,240,0.3);
+        }
+
+        .card-body { padding: 1.6rem 1.8rem 1.8rem; }
+        .main-card .card-body { padding: 2rem 2.2rem 2.2rem; }
+
+        .card-meta { color: var(--fog); font-size: 0.75rem; font-weight: 500; margin-bottom: 0.7rem; }
+
+        .card-title {
+            font-family: 'Fraunces', serif; font-weight: 700;
+            color: var(--soil); line-height: 1.2;
+            margin-bottom: 0.8rem; letter-spacing: -0.4px;
+        }
+
+        .main-card .card-title { font-size: 1.8rem; }
+        .country-card:not(.main-card) .card-title { font-size: 1.1rem; }
+
+        .card-excerpt { color: var(--dusk); font-size: 0.92rem; line-height: 1.75; margin-bottom: 1.4rem; font-weight: 400; }
+        .country-card:not(.main-card) .card-excerpt { display: none; }
+
+        .card-read {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            color: var(--europa); font-size: 0.8rem; font-weight: 700;
+            letter-spacing: 0.5px; text-decoration: none;
+            transition: gap 0.2s;
+        }
+
+        .card-read:hover { gap: 0.9rem; }
+
+        /* HIGHLIGHTS */
+        .highlights-section {
+            background: var(--soil); padding: 6rem 4rem;
+            position: relative; overflow: hidden;
+        }
+
+        .highlights-section::before {
+            content: ''; position: absolute;
+            top: -100px; right: -100px;
+            width: 500px; height: 500px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(46,109,164,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .highlights-inner { max-width: 1320px; margin: 0 auto; }
+
+        .highlights-section .eyebrow-text { color: #A8D4F0; }
+        .highlights-section .eyebrow-line { background: #A8D4F0; }
+        .highlights-section .section-title { color: white; }
+        .highlights-section .section-title em { color: var(--europa-lt); }
+
+        .highlights-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 1rem; margin-top: 3.5rem;
+        }
+
+        .highlight-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 2rem 1.5rem;
+            transition: all 0.35s ease;
+            position: relative; overflow: hidden;
+        }
+
+        .highlight-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(46,109,164,0.12), transparent);
+            opacity: 0; transition: opacity 0.3s;
+        }
+
+        .highlight-card:hover { background: rgba(255,255,255,0.09); border-color: rgba(168,212,240,0.35); transform: translateY(-5px); }
+        .highlight-card:hover::before { opacity: 1; }
+
+        .highlight-icon { font-size: 2rem; display: block; margin-bottom: 1.1rem; }
+
+        .highlight-name {
+            font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700;
+            color: white; display: block; margin-bottom: 0.5rem;
+        }
+
+        .highlight-desc {
+            font-size: 0.82rem; color: rgba(255,255,255,0.45);
+            font-weight: 400; line-height: 1.6;
+        }
+
+        /* DATA BAND */
+        .data-band { background: var(--sand); padding: 4.5rem 4rem; }
+
+        .data-band-inner {
+            max-width: 1320px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 2rem; text-align: center;
+        }
+
+        .data-num {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2.2rem, 4vw, 3.5rem);
+            font-weight: 700; color: var(--europa); line-height: 1;
+            margin-bottom: 0.4rem;
+        }
+
+        .data-label {
+            font-size: 0.75rem; color: var(--dusk);
+            font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        /* MANIFESTO */
+        .manifesto {
+            max-width: 1320px; margin: 7rem auto; padding: 0 4rem;
+            display: grid; grid-template-columns: 1fr 1.1fr;
+            gap: 6rem; align-items: center;
+        }
+
+        .manifesto-quote {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(2rem, 3.5vw, 2.8rem);
+            font-weight: 300; font-style: italic;
+            color: var(--soil); line-height: 1.25;
+            border-left: 3px solid var(--europa);
+            padding-left: 1.8rem; margin-bottom: 1.8rem;
+        }
+
+        .manifesto-body {
+            font-size: 0.98rem; color: var(--dusk);
+            line-height: 1.9; margin-bottom: 2.2rem;
+        }
+
+        .manifesto-link {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            color: var(--europa); font-weight: 700; font-size: 0.85rem;
+            text-decoration: none; letter-spacing: 0.3px;
+            transition: gap 0.2s;
+        }
+
+        .manifesto-link:hover { gap: 0.9rem; }
+
+        .stats-row {
+            display: flex; gap: 1.5rem; margin-top: 2.5rem;
+        }
+
+        .stat {
+            background: var(--sand); border-radius: 10px;
+            padding: 1.2rem 1.5rem; flex: 1; text-align: center;
+        }
+
+        .stat-num {
+            font-family: 'Fraunces', serif; font-size: 2rem;
+            font-weight: 700; color: var(--europa); line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.7rem; color: var(--dusk); font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase; margin-top: 0.3rem;
+        }
+
+        .manifesto-visual {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            grid-template-rows: 240px 150px;
+            gap: 0.8rem;
+        }
+
+        .mosaic-block {
+            border-radius: 10px; overflow: hidden;
+            background: var(--parchment);
+        }
+
+        .mosaic-block:first-child { grid-row: span 2; }
+
+        .mosaic-block img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: center;
+            display: block;
+        }
+
+        /* DESTINATIONS */
+        .destinations-section {
+            background: var(--sand); padding: 6rem 4rem;
+        }
+
+        .destinations-inner { max-width: 1320px; margin: 0 auto; }
+
+        .dest-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 1rem; margin-top: 3.5rem;
+        }
+
+        .dest-card {
+            display: flex; flex-direction: column; align-items: center;
+            gap: 0.9rem; padding: 2rem 1.2rem;
+            background: var(--white); border-radius: 12px;
+            text-decoration: none; color: var(--soil);
+            border: 1px solid var(--parchment);
+            transition: all 0.3s ease;
+        }
+
+        .dest-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(46,27,14,0.12); border-color: var(--europa); }
+
+        .dest-emoji {
+            width: 64px; height: 64px; border-radius: 10px;
+            overflow: hidden; background: var(--parchment);
+        }
+
+        .dest-emoji img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        .dest-name {
+            font-family: 'Fraunces', serif; font-weight: 700;
+            font-size: 1rem; text-align: center;
+        }
+
+        .dest-count {
+            font-size: 0.7rem; color: var(--fog); font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        /* REVEAL */
+        .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* FOOTER */
+        footer { background: var(--soil); padding: 5rem 4rem 3rem; }
+
+        .footer-inner { max-width: 1320px; margin: 0 auto; }
+
+        .footer-top {
+            display: grid; grid-template-columns: 2fr 1fr 1fr;
+            gap: 4rem; padding-bottom: 3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo {
+            font-family: 'Syne', sans-serif; font-size: 2rem;
+            font-weight: 800; color: white; margin-bottom: 0.8rem;
+        }
+
+        .footer-tagline { color: rgba(255,255,255,0.45); font-size: 0.88rem; line-height: 1.7; }
+
+        .footer-col h4 {
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--europa-lt); margin-bottom: 1.2rem;
+        }
+
+        .footer-col ul { list-style: none; }
+
+        .footer-col ul li { margin-bottom: 0.6rem; }
+
+        .footer-col ul a {
+            color: rgba(255,255,255,0.45) !important; font-size: 0.88rem;
+            text-decoration: none; transition: color 0.2s;
+            font-weight: 400 !important; letter-spacing: 0 !important;
+            text-transform: none !important;
+        }
+
+        .footer-col ul a:hover { color: white !important; }
+
+        .footer-bottom {
+            text-align: center; color: rgba(255,255,255,0.25);
+            font-size: 0.78rem;
+        }
+
+        /* HAMBURGUESA */
+        .hamburger {
+            display: none; flex-direction: column; justify-content: center;
+            gap: 5px; background: none; border: none; cursor: pointer;
+            padding: 6px; z-index: 1100;
+        }
+
+        .hamburger span {
+            display: block; width: 24px; height: 2px;
+            background: white; border-radius: 2px;
+            transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        header.scrolled .hamburger span { background: var(--soil); }
+        .hamburger.open span { background: var(--soil); }
+
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* OVERLAY */
+        .nav-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(46,27,14,0.5); z-index: 1000;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .nav-overlay.open { display: block; }
+
+        /* TABLET */
+        @media (max-width: 1100px) {
+            .highlights-grid { grid-template-columns: repeat(2, 1fr); }
+            .dest-grid { grid-template-columns: repeat(2, 1fr); }
+            .country-cards-grid { grid-template-columns: 1fr; }
+            .country-card.main-card { grid-row: span 1; }
+            .country-card:not(.main-card) .card-excerpt { display: block; }
+            .manifesto { grid-template-columns: 1fr; gap: 3.5rem; }
+            .footer-top { grid-template-columns: 1fr 1fr; gap: 3rem; }
+            .data-band-inner { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* MÓVIL */
+        @media (max-width: 768px) {
+            header { padding: 1rem 1.25rem; }
+            header.scrolled { padding: 0.8rem 1.25rem; }
+            .hamburger { display: flex; }
+
+            .nav-links {
+                position: fixed; top: 0; right: -100%;
+                width: min(300px, 82vw); height: 100dvh;
+                flex-direction: column; align-items: stretch;
+                gap: 0; padding: 0; padding-top: 4.5rem;
+                background: var(--white);
+                box-shadow: -6px 0 32px rgba(46,27,14,0.2);
+                transition: right 0.38s cubic-bezier(0.4,0,0.2,1);
+                z-index: 1050; overflow-y: auto; overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+            }
+            .nav-links.open { right: 0; }
+            .nav-links > li { width: 100%; border-bottom: 1px solid var(--parchment); }
+            .nav-links > li > a {
+                color: var(--soil) !important; font-size: 0.9rem; letter-spacing: 0.5px;
+                padding: 1rem 1.5rem; display: flex; align-items: center;
+                justify-content: space-between; width: 100%; min-height: 48px; cursor: pointer;
+            }
+            .nav-links a:hover { color: var(--europa) !important; }
+
+            .dropdown-arrow {
+                display: inline-block !important; font-size: 0.75rem;
+                transition: transform 0.3s ease; margin-left: auto; color: var(--europa);
+            }
+            #toggleDestinosMobile.active .dropdown-arrow { transform: rotate(180deg); }
+
+            .dropdown { display: none !important; }
+            .dropdown.show-mobile {
+                display: block !important; position: static !important;
+                transform: none !important; opacity: 1 !important; visibility: visible !important;
+                box-shadow: none !important; border: none !important; border-radius: 0 !important;
+                min-width: unset !important; padding: 0 !important; background: var(--sand);
+            }
+            .dropdown.show-mobile .continent-item { padding: 0; border-bottom: 1px solid rgba(46,27,14,0.06); }
+            .dropdown.show-mobile .continent-item:last-child { border-bottom: none; }
+            .dropdown.show-mobile .continent-link {
+                display: flex !important; align-items: center !important;
+                padding: 0.85rem 1.5rem 0.85rem 2rem; min-height: 48px;
+                font-size: 0.88rem !important; color: var(--soil) !important; text-decoration: none;
+            }
+            .dropdown.show-mobile .continent-emoji { width: 26px; height: 26px; border-radius: 5px; flex-shrink: 0; margin-right: 0.65rem; }
+            .dropdown.show-mobile .continent-arrow { display: none; }
+            .dropdown.show-mobile .countries-dropdown { display: none !important; }
+
+            .hero { padding: 0 1.25rem 5rem; min-height: 100svh; min-height: -webkit-fill-available; }
+            .hero h1 { font-size: clamp(2.6rem, 11vw, 4rem); letter-spacing: -1.5px; line-height: 1; }
+            .hero-bottom { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+            .hero-desc { font-size: 0.95rem; max-width: 100%; }
+            .hero-actions { flex-direction: column; width: 100%; gap: 0.75rem; }
+            .btn-primary, .btn-secondary { width: 100%; justify-content: center; padding: 0.95rem 1.5rem; min-height: 48px; }
+
+            .countries-section { padding: 0 1.25rem; margin: 3.5rem auto; }
+            .section-title { margin-bottom: 2rem; }
+            .main-card .card-img { height: 260px; }
+            .country-card:not(.main-card) .card-img { height: 200px; }
+            .country-card:not(.main-card) .card-excerpt { display: block; }
+
+            .highlights-section { padding: 3.5rem 1.25rem; }
+            .highlights-grid { grid-template-columns: 1fr; gap: 0.75rem; margin-top: 2rem; }
+
+            .data-band { padding: 3rem 1.25rem; }
+            .data-band-inner { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+
+            .manifesto { padding: 0 1.25rem; margin: 3.5rem auto; gap: 2.5rem; }
+            .manifesto-visual { grid-template-columns: 1fr 1fr; grid-template-rows: 160px 100px; gap: 0.6rem; }
+            .manifesto-quote { font-size: clamp(1.55rem, 6vw, 2rem); padding-left: 1.1rem; }
+            .stats-row { gap: 0.7rem; }
+            .stat { padding: 1rem 0.8rem; }
+            .stat-num { font-size: 1.7rem; }
+
+            .destinations-section { padding: 3.5rem 1.25rem; }
+            .dest-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-top: 2rem; }
+            .dest-card { padding: 1.4rem 0.9rem; }
+            .dest-emoji { width: 52px; height: 52px; }
+
+            footer { padding: 3rem 1.25rem 2rem; }
+            .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+            .footer-logo { font-size: 1.6rem; }
+        }
+
+        @media (max-width: 400px) {
+            .hero h1 { font-size: clamp(2.2rem, 10vw, 2.8rem); }
+            .dest-grid { gap: 0.5rem; }
+            .dest-card { padding: 1.1rem 0.6rem; }
+            .dest-emoji { width: 44px; height: 44px; }
+            .dest-name { font-size: 0.85rem; }
+            .dest-count { font-size: 0.65rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header id="mainHeader">
+        <a href="index.html" class="logo">Hey Rowen</a>
+        <button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html">Home</a></li>
+            <li>
+                <a id="toggleDestinosMobile">Destinos <span class="dropdown-arrow">▾</span></a>
+                <div class="dropdown">
+                    <div class="continent-item">
+                        <a href="europa.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-europa.jpg" alt="Europa"></span>Europa</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="espana.html">España</a></div>
+                            <div class="country-item"><a href="francia.html">Francia</a></div>
+                            <div class="country-item"><a href="italia.html">Italia</a></div>
+                            <div class="country-item"><a href="portugal.html">Portugal</a></div>
+                            <div class="country-item"><a href="grecia.html">Grecia</a></div>
+                        </div>
+                    </div>
+                    <div class="continent-item">
+                        <a href="america.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-america.jpg" alt="América"></span>América</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="mexico.html">México</a></div>
+                            <div class="country-item"><a href="estados-unidos.html">Estados Unidos</a></div>
+                            <div class="country-item"><a href="canada.html">Canadá</a></div>
+                            <div class="country-item"><a href="peru.html">Perú</a></div>
+                            <div class="country-item"><a href="argentina.html">Argentina</a></div>
+                        </div>
+                    </div>
+                    <div class="continent-item">
+                        <a href="asia.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-asia.jpg" alt="Asia"></span>Asia</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="japon.html">Japón</a></div>
+                            <div class="country-item"><a href="tailandia.html">Tailandia</a></div>
+                            <div class="country-item"><a href="vietnam.html">Vietnam</a></div>
+                            <div class="country-item"><a href="india.html">India</a></div>
+                        </div>
+                    </div>
+                    <div class="continent-item">
+                        <a href="africa.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-africa.jpg" alt="África"></span>África</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="marruecos.html">Marruecos</a></div>
+                            <div class="country-item"><a href="egipto.html">Egipto</a></div>
+                            <div class="country-item"><a href="sudafrica.html">Sudáfrica</a></div>
+                        </div>
+                    </div>
+                    <div class="continent-item">
+                        <a href="oceania.html" class="continent-link">
+                            <span><span class="continent-emoji"><img src="images/dest-oceania.jpg" alt="Oceanía"></span>Oceanía</span>
+                            <span class="continent-arrow">›</span>
+                        </a>
+                        <div class="countries-dropdown">
+                            <div class="country-item"><a href="australia.html">Australia</a></div>
+                            <div class="country-item"><a href="nueva-zelanda.html">Nueva Zelanda</a></div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-tag">✦ 5 países · Siglos de historia y cultura</div>
+            <h1>
+                Europa,<br>
+                <span class="italic-line">sin acabar.</span>
+            </h1>
+            <div class="hero-bottom">
+                <p class="hero-desc">Callejones empedrados que huelen a café, museos que te cambian la vida, playas que parecen de otro planeta y cenas que se alargan hasta la madrugada. Europa siempre tiene algo más que darte.</p>
+                <div class="hero-actions">
+                    <a href="#paises" class="btn-primary">Explorar países ↓</a>
+                    <a href="index.html" class="btn-secondary">Todos los destinos</a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-hint">
+            <div class="scroll-line"></div>
+            scroll
+        </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="vibe-strip">
+        <div class="vibe-track">
+            <span class="vibe-item">Atardecer en Santorini <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Croissant en París al amanecer <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Pizza en Nápoles <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Fado en Lisboa <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Sagrada Família de noche <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Coliseo al amanecer <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Atardecer en Santorini <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Croissant en París al amanecer <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Pizza en Nápoles <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Fado en Lisboa <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Sagrada Família de noche <span class="vibe-dot"></span></span>
+            <span class="vibe-item">Coliseo al amanecer <span class="vibe-dot"></span></span>
+        </div>
+    </div>
+
+    <!-- PAÍSES -->
+    <section class="countries-section" id="paises">
+        <div class="section-eyebrow reveal">
+            <div class="eyebrow-line"></div>
+            <span class="eyebrow-text">Destinos en Europa</span>
+        </div>
+        <h2 class="section-title reveal">Los países que <em>no te puedes perder</em></h2>
+
+        <div class="country-cards-grid">
+            <!-- CARD PRINCIPAL: ESPAÑA -->
+            <article class="country-card main-card reveal">
+                <div class="card-img">
+                    <div class="card-img-inner img-espana">
+                        <img src="images/post-espana.jpg" alt="España">
+                    </div>
+                    <span class="card-pill">Cultura</span>
+                </div>
+                <div class="card-body">
+                    <div class="card-meta">Pasión, sol y siesta · 17 comunidades autónomas</div>
+                    <h3 class="card-title">España: Flamenco, Tapas y la Vida que Más Gusta Vivir</h3>
+                    <p class="card-excerpt">De los bares de pintxos del País Vasco a las playas infinitas de Andalucía. De la Sagrada Família a los pueblos blancos de la sierra. España es el país que más cuesta abandonar.</p>
+                    <a href="espana.html" class="card-read">Explorar España →</a>
+                </div>
+            </article>
+
+            <!-- ITALIA -->
+            <article class="country-card reveal">
+                <div class="card-img">
+                    <div class="card-img-inner img-italia">
+                        <img src="images/post-italia.jpg" alt="Italia">
+                    </div>
+                    <span class="card-pill">Gastronomía</span>
+                </div>
+                <div class="card-body">
+                    <div class="card-meta">La dolce vita · 20 regiones</div>
+                    <h3 class="card-title">Italia: Arte, Pasta y Amor a Primera Vista</h3>
+                    <p class="card-excerpt">Roma, Florencia, Venecia y la Costa Amalfitana: Italia es un museo al aire libre con la mejor mesa del mundo.</p>
+                    <a href="italia.html" class="card-read">Explorar →</a>
+                </div>
+            </article>
+
+            <!-- FRANCIA -->
+            <article class="country-card reveal">
+                <div class="card-img">
+                    <div class="card-img-inner img-francia">
+                        <img src="images/post-francia.jpg" alt="Francia">
+                    </div>
+                    <span class="card-pill">Arte</span>
+                </div>
+                <div class="card-body">
+                    <div class="card-meta">Liberté, égalité, beauté · 13 regiones</div>
+                    <h3 class="card-title">Francia: De París a la Provenza, Siempre con Estilo</h3>
+                    <p class="card-excerpt">La Torre Eiffel al anochecer, los viñedos de Burdeos y los mercados de lavanda del sur: Francia nunca decepciona.</p>
+                    <a href="francia.html" class="card-read">Explorar →</a>
+                </div>
+            </article>
+        </div>
+
+        <!-- PORTUGAL + GRECIA -->
+        <div style="margin-top:1.2rem;">
+            <article class="country-card reveal">
+                <div style="display:grid; grid-template-columns:1.6fr 1fr; gap:0;">
+                    <div class="card-img" style="height:240px;">
+                        <div class="card-img-inner img-portugal">
+                            <img src="images/post-portugal.jpg" alt="Portugal">
+                        </div>
+                        <span class="card-pill">Slow travel</span>
+                    </div>
+                    <div class="card-body" style="display:flex; flex-direction:column; justify-content:center;">
+                        <div class="card-meta">El atlántico en el alma · De Lisboa al Alentejo</div>
+                        <h3 class="card-title" style="font-size:1.5rem;">Portugal: El País que Siempre Sorprende</h3>
+                        <p class="card-excerpt" style="display:block;">Pastéis de nata, azulejos brillando al sol, el fado que te rompe el corazón y olas perfectas en la Costa Vicentina. Portugal es Europa con sabor propio.</p>
+                        <a href="portugal.html" class="card-read">Explorar Portugal →</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <div style="margin-top:1.2rem;">
+            <article class="country-card reveal">
+                <div style="display:grid; grid-template-columns:1fr 1.6fr; gap:0;">
+                    <div class="card-body" style="display:flex; flex-direction:column; justify-content:center; padding: 2rem 2.2rem;">
+                        <div class="card-meta">Dioses, mares y filosofía · Más de 6.000 islas</div>
+                        <h3 class="card-title" style="font-size:1.5rem;">Grecia: Donde el Mundo Antiguo Vive al Sol</h3>
+                        <p class="card-excerpt" style="display:block;">La Acrópolis al amanecer, los atardeceres de Oia, el mar más azul que hayas visto jamás y tabernas donde el tiempo se detiene. Grecia es un sueño hecho destino.</p>
+                        <a href="grecia.html" class="card-read">Explorar Grecia →</a>
+                    </div>
+                    <div class="card-img" style="height:240px;">
+                        <div class="card-img-inner img-grecia">
+                            <img src="images/post-grecia.jpg" alt="Grecia">
+                        </div>
+                        <span class="card-pill">Islas</span>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- HIGHLIGHTS -->
+    <section class="highlights-section">
+        <div class="highlights-inner">
+            <div class="section-eyebrow reveal">
+                <div class="eyebrow-line"></div>
+                <span class="eyebrow-text">Por qué viajar a Europa</span>
+            </div>
+            <h2 class="section-title reveal">Lo que hace <em>único este continente</em></h2>
+            <div class="highlights-grid">
+                <div class="highlight-card reveal">
+                    <span class="highlight-icon">🏛️</span>
+                    <span class="highlight-name">Historia en cada esquina</span>
+                    <p class="highlight-desc">Foros romanos, catedrales góticas, castillos medievales y plazas renacentistas. En Europa la historia no está en los libros: está en la calle, esperándote.</p>
+                </div>
+                <div class="highlight-card reveal">
+                    <span class="highlight-icon">🍷</span>
+                    <span class="highlight-name">Gastronomía de otro nivel</span>
+                    <p class="highlight-desc">Pasta italiana, croissants franceses, pintxos vascos, souvlaki griego, pastel de nata portugués. Europa inventó el concepto de comer bien y sigue en ello cada día.</p>
+                </div>
+                <div class="highlight-card reveal">
+                    <span class="highlight-icon">🚂</span>
+                    <span class="highlight-name">Moverse es un placer</span>
+                    <p class="highlight-desc">Trenes que atraviesan los Alpes, ferrys a islas de postal, rutas en bicicleta por Ámsterdam. En Europa el viaje forma parte de la experiencia.</p>
+                </div>
+                <div class="highlight-card reveal">
+                    <span class="highlight-icon">🌅</span>
+                    <span class="highlight-name">Paisajes para todos</span>
+                    <p class="highlight-desc">Fiordos noruegos, playas mediterráneas, colinas toscanas, pueblos de cuento en los Alpes. Europa tiene el paisaje exacto que estás buscando, sea cual sea.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DATOS -->
+    <div class="data-band">
+        <div class="data-band-inner">
+            <div class="data-stat reveal">
+                <div class="data-num">5</div>
+                <div class="data-label">Países explorados</div>
+            </div>
+            <div class="data-stat reveal">
+                <div class="data-num">+30</div>
+                <div class="data-label">Artículos publicados</div>
+            </div>
+            <div class="data-stat reveal">
+                <div class="data-num">2.500</div>
+                <div class="data-label">Años de historia</div>
+            </div>
+            <div class="data-stat reveal">
+                <div class="data-num">100%</div>
+                <div class="data-label">Sin filtros</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MANIFESTO -->
+    <section class="manifesto">
+        <div class="manifesto-text reveal">
+            <div class="section-eyebrow" style="margin-bottom:1rem">
+                <div class="eyebrow-line"></div>
+                <span class="eyebrow-text">Nuestra visión</span>
+            </div>
+            <blockquote class="manifesto-quote">
+                Europa no se agota.<br>
+                Siempre tiene <strong>algo más.</strong>
+            </blockquote>
+            <p class="manifesto-body">Hemos visto amanecer en el Coliseo, tomado café en terrazas parisinas y perdido el tren en Lisboa para acabar encontrando el mejor bar de la ciudad. Europa es el continente que más veces nos ha hecho cambiar de planes, y jamás nos ha defraudado por eso.</p>
+            <a href="nosotros.html" class="manifesto-link">Conoce nuestra historia →</a>
+            <div class="stats-row">
+                <div class="stat"><div class="stat-num">5</div><div class="stat-label">Países</div></div>
+                <div class="stat"><div class="stat-num">+30</div><div class="stat-label">Artículos</div></div>
+                <div class="stat"><div class="stat-num">Real</div><div class="stat-label">Sin filtros</div></div>
+            </div>
+        </div>
+        <div class="manifesto-visual reveal">
+            <div class="mosaic-block"><img src="images/atardecer_portada.jpg" alt="Atardecer en Europa"></div>
+            <div class="mosaic-block"><img src="images/montana_portada.jpg" alt="Montañas europeas"></div>
+            <div class="mosaic-block"><img src="images/mar_portada.jpg" alt="Mar mediterráneo"></div>
+        </div>
+    </section>
+
+    <!-- OTROS CONTINENTES -->
+    <section class="destinations-section">
+        <div class="destinations-inner">
+            <div class="section-eyebrow reveal">
+                <div class="eyebrow-line"></div>
+                <span class="eyebrow-text">Seguir explorando</span>
+            </div>
+            <h2 class="section-title reveal">El mundo, <em>más allá de Europa</em></h2>
+            <div class="dest-grid">
+                <a href="america.html" class="dest-card reveal"><span class="dest-emoji"><img src="images/dest-america.jpg" alt="América"></span><span class="dest-name">América</span><span class="dest-count">5 países</span></a>
+                <a href="asia.html" class="dest-card reveal"><span class="dest-emoji"><img src="images/dest-asia.jpg" alt="Asia"></span><span class="dest-name">Asia</span><span class="dest-count">4 países</span></a>
+                <a href="africa.html" class="dest-card reveal"><span class="dest-emoji"><img src="images/dest-africa.jpg" alt="África"></span><span class="dest-name">África</span><span class="dest-count">3 países</span></a>
+                <a href="oceania.html" class="dest-card reveal"><span class="dest-emoji"><img src="images/dest-oceania.jpg" alt="Oceanía"></span><span class="dest-name">Oceanía</span><span class="dest-count">2 países</span></a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div>
+                    <div class="footer-logo">Hey Rowen</div>
+                    <p class="footer-tagline">Viaja sin filtros.<br>El mundo te está esperando. ✦</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Destinos</h4>
+                    <ul>
+                        <li><a href="europa.html">Europa</a></li>
+                        <li><a href="america.html">América</a></li>
+                        <li><a href="asia.html">Asia</a></li>
+                        <li><a href="africa.html">África</a></li>
+                        <li><a href="oceania.html">Oceanía</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Blog</h4>
+                    <ul>
+                        <li><a href="nosotros.html">Nosotros</a></li>
+                        <li><a href="contacto.html">Contacto</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">&copy; 2026 Hey Rowen — Todos los derechos reservados</div>
+        </div>
+    </footer>
+
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <script>
+        const header = document.getElementById('mainHeader');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 60);
+        }, { passive: true });
+
+        const reveals = document.querySelectorAll('.reveal');
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.08 });
+        reveals.forEach(el => io.observe(el));
+
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('navLinks');
+        const overlay   = document.getElementById('navOverlay');
+
+        function openMenu() {
+            hamburger.classList.add('open');
+            navLinks.classList.add('open');
+            overlay.classList.add('open');
+            hamburger.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMenu() {
+            hamburger.classList.remove('open');
+            navLinks.classList.remove('open');
+            overlay.classList.remove('open');
+            hamburger.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+            closeDestinos();
+        }
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.contains('open') ? closeMenu() : openMenu();
+        });
+        overlay.addEventListener('click', closeMenu);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+        const destinosBtn = document.getElementById('toggleDestinosMobile');
+        const dropdown    = destinosBtn ? destinosBtn.nextElementSibling : null;
+
+        function closeDestinos() {
+            if (!dropdown) return;
+            dropdown.classList.remove('show-mobile');
+            destinosBtn.classList.remove('active');
+        }
+
+        if (destinosBtn && dropdown) {
+            destinosBtn.addEventListener('click', (e) => {
+                if (window.innerWidth > 768) return;
+                e.preventDefault();
+                const isOpen = dropdown.classList.contains('show-mobile');
+                if (isOpen) { closeDestinos(); } else {
+                    dropdown.classList.add('show-mobile');
+                    destinosBtn.classList.add('active');
+                }
+            });
+        }
+
+        navLinks.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+    </script>
+</body>
+</html>
