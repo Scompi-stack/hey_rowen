@@ -561,42 +561,38 @@
         .reveal:nth-child(4) { transition-delay: 0.3s; }
         .reveal:nth-child(5) { transition-delay: 0.4s; }
 
-        /* HAMBURGER BUTTON */
+        /* ─── HAMBURGER ─── */
         .hamburger {
             display: none;
             flex-direction: column; justify-content: center; align-items: center;
-            gap: 5px; width: 42px; height: 42px;
+            gap: 5px; width: 44px; height: 44px; /* área táctil mínima 44px */
             background: transparent; border: none; cursor: pointer;
-            padding: 6px; border-radius: 8px;
-            transition: background 0.2s;
+            padding: 0; border-radius: 8px; flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
             z-index: 1100;
         }
-
         .hamburger span {
-            display: block; width: 24px; height: 2px;
+            display: block; width: 22px; height: 2px;
             background: white; border-radius: 2px;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.35s cubic-bezier(0.4,0,0.2,1),
+                        opacity  0.35s cubic-bezier(0.4,0,0.2,1);
             transform-origin: center;
         }
-
         header.scrolled .hamburger span { background: var(--soil); }
-
         .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
         .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
         .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        /* MOBILE NAV OVERLAY */
+        /* ─── OVERLAY ─── */
         .nav-overlay {
-            display: none;
-            position: fixed; inset: 0;
-            background: rgba(46,27,14,0.45);
-            z-index: 999;
-            backdrop-filter: blur(2px);
+            display: none; position: fixed; inset: 0;
+            background: rgba(46,27,14,0.5);
+            z-index: 1000;
+            -webkit-tap-highlight-color: transparent;
         }
-
         .nav-overlay.open { display: block; }
 
-        /* RESPONSIVE */
+        /* ─── TABLET ─── */
         @media (max-width: 1100px) {
             .dest-grid { grid-template-columns: repeat(3, 1fr); }
             .posts-grid { grid-template-columns: 1fr; }
@@ -606,92 +602,177 @@
             .footer-top { grid-template-columns: 1fr 1fr; gap: 3rem; }
         }
 
+        /* ─── MÓVIL ─── */
         @media (max-width: 768px) {
+
             /* HEADER */
-            header { padding: 1.1rem 1.5rem; }
-            header.scrolled { padding: 0.85rem 1.5rem; }
+            header { padding: 1rem 1.25rem; }
+            header.scrolled { padding: 0.8rem 1.25rem; }
             .hamburger { display: flex; }
 
-            /* MOBILE NAV DRAWER */
+            /* DRAWER LATERAL */
             .nav-links {
+                /* Ocultamos a la derecha y lo traemos con .open */
                 position: fixed; top: 0; right: -100%;
-                width: min(320px, 85vw); height: 100dvh;
-                flex-direction: column; align-items: flex-start;
-                gap: 0; padding: 5.5rem 0 2rem;
+                width: min(300px, 82vw); height: 100dvh;
+                flex-direction: column; align-items: stretch;
+                gap: 0; padding: 0; padding-top: 4.5rem;
                 background: var(--white);
-                box-shadow: -8px 0 40px rgba(46,27,14,0.18);
-                transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
-                z-index: 1050; overflow-y: auto;
+                box-shadow: -6px 0 32px rgba(46,27,14,0.2);
+                transition: right 0.38s cubic-bezier(0.4,0,0.2,1);
+                z-index: 1050; overflow-y: auto; overflow-x: hidden;
+                /* Evita rebote de scroll en iOS */
+                -webkit-overflow-scrolling: touch;
             }
-
             .nav-links.open { right: 0; }
 
-            .nav-links > li { width: 100%; border-bottom: 1px solid var(--parchment); }
-
+            /* Items de primer nivel */
+            .nav-links > li {
+                width: 100%;
+                border-bottom: 1px solid var(--parchment);
+            }
             .nav-links > li > a {
                 color: var(--soil) !important;
-                font-size: 0.92rem; padding: 1.1rem 1.8rem;
-                display: flex; width: 100%;
+                font-size: 0.9rem; letter-spacing: 0.5px;
+                padding: 1rem 1.5rem;
+                display: flex; align-items: center;
+                justify-content: space-between;
+                width: 100%; min-height: 48px; /* área táctil */
+                cursor: pointer;
+            }
+            .nav-links a:hover { color: var(--ember) !important; }
+
+            /* Flecha de Destinos visible y animada */
+            .dropdown-arrow {
+                display: inline-block !important;
+                font-size: 0.75rem;
+                transition: transform 0.3s ease;
+                margin-left: auto;
+                color: var(--ember);
+            }
+            #toggleDestinosMobile.active .dropdown-arrow {
+                transform: rotate(180deg);
             }
 
-            /* Hide nested dropdowns on mobile — accordion replaces hover */
-            .dropdown, .countries-dropdown { display: none !important; }
-            .dropdown-arrow { display: inline !important; transition: transform 0.3s; }
-
-            /* Accordion: show dropdown when toggled */
-            .nav-links.open .dropdown.show-mobile {
+            /* ── ACORDEÓN DE DESTINOS ── */
+            /* Estado cerrado: oculto */
+            .dropdown {
+                display: none !important; /* oculto por defecto */
+            }
+            /* Estado abierto: acordeón estático */
+            .dropdown.show-mobile {
                 display: block !important;
-                position: static;
-                transform: none;
-                box-shadow: none;
-                border: none;
-                opacity: 1;
-                visibility: visible;
-                padding-left: 1.5rem;
+                position: static !important;
+                transform: none !important;
+                opacity: 1 !important; visibility: visible !important;
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                min-width: unset !important;
+                padding: 0 !important;
                 background: var(--sand);
-                border-radius: 0;
-                min-width: unset;
+            }
+            /* Cada continente en el acordeón */
+            .dropdown.show-mobile .continent-item {
+                padding: 0;
+                border-bottom: 1px solid rgba(46,27,14,0.06);
+            }
+            .dropdown.show-mobile .continent-item:last-child {
+                border-bottom: none;
+            }
+            /* El enlace de continente ocupa toda la fila */
+            .dropdown.show-mobile .continent-link {
+                display: flex !important;
+                align-items: center !important;
+                padding: 0.85rem 1.5rem 0.85rem 2rem;
+                min-height: 48px;
+                font-size: 0.88rem !important;
+                color: var(--soil) !important;
+                text-decoration: none;
+            }
+            .dropdown.show-mobile .continent-link:active {
+                background: rgba(217,95,43,0.08);
+            }
+            /* Foto de continente */
+            .dropdown.show-mobile .continent-emoji {
+                width: 26px; height: 26px;
+                border-radius: 5px; flex-shrink: 0;
+                margin-right: 0.65rem;
+            }
+            /* Ocultar la flecha lateral › y el submenú de países */
+            .dropdown.show-mobile .continent-arrow { display: none; }
+            .dropdown.show-mobile .countries-dropdown { display: none !important; }
+
+            /* ── HERO ── */
+            .hero {
+                padding: 0 1.25rem 5rem;
+                min-height: 100svh;
+                /* En iOS Safari el 100vh no funciona bien */
+                min-height: -webkit-fill-available;
+            }
+            .hero h1 {
+                font-size: clamp(2.6rem, 11vw, 4rem);
+                letter-spacing: -1.5px;
+                line-height: 1;
+            }
+            .hero-bottom {
+                flex-direction: column;
+                align-items: flex-start; gap: 1.5rem;
+            }
+            .hero-desc { font-size: 0.95rem; max-width: 100%; }
+            .hero-actions { flex-direction: column; width: 100%; gap: 0.75rem; }
+            .btn-primary, .btn-secondary {
+                width: 100%; justify-content: center;
+                padding: 0.95rem 1.5rem;
+                min-height: 48px; /* área táctil */
             }
 
-            /* Hide country sub-dropdowns inside the accordion */
-            .nav-links.open .dropdown.show-mobile .countries-dropdown { display: none !important; }
+            /* ── POSTS ── */
+            .posts-section { padding: 0 1.25rem; margin: 3.5rem auto; }
+            .section-title { margin-bottom: 2rem; }
+            .main-card .post-img { height: 260px; }
+            .post-card:not(.main-card) .post-img { height: 200px; }
+            /* Mostrar excerpt en todas las cards en móvil */
+            .post-card:not(.main-card) .post-excerpt { display: block; }
 
-            /* Rotate arrow when open */
-            #toggleDestinosMobile.active .dropdown-arrow { transform: rotate(180deg); }
+            /* ── DESTINOS ── */
+            .destinations-section { padding: 3.5rem 1.25rem; }
+            .dest-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem; margin-top: 2rem;
+            }
+            .dest-card { padding: 1.4rem 0.9rem; }
+            .dest-emoji { width: 52px; height: 52px; }
 
-            /* HERO */
-            .hero { padding: 0 1.4rem 4.5rem; min-height: 100svh; }
-            .hero h1 { font-size: clamp(2.8rem, 12vw, 4.5rem); letter-spacing: -2px; }
-            .hero-bottom { flex-direction: column; align-items: flex-start; gap: 1.4rem; }
-            .hero-actions { flex-direction: column; width: 100%; gap: 0.8rem; }
-            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+            /* ── MANIFESTO ── */
+            .manifesto { padding: 0 1.25rem; margin: 3.5rem auto; gap: 2.5rem; }
+            .manifesto-visual {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 160px 100px;
+                gap: 0.6rem;
+            }
+            .manifesto-quote {
+                font-size: clamp(1.55rem, 6vw, 2rem);
+                padding-left: 1.1rem;
+            }
+            .stats-row { gap: 0.7rem; }
+            .stat { padding: 1rem 0.8rem; }
+            .stat-num { font-size: 1.7rem; }
 
-            /* POSTS */
-            .posts-section { padding: 0 1.4rem; margin: 4rem auto; }
-
-            /* DESTINATIONS */
-            .destinations-section { padding: 4rem 1.4rem; }
-            .dest-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
-            .dest-card { padding: 1.6rem 1rem; }
-
-            /* MANIFESTO */
-            .manifesto { padding: 0 1.4rem; margin: 4rem auto; }
-            .manifesto-visual { grid-template-rows: 180px 110px; }
-            .manifesto-quote { font-size: clamp(1.6rem, 6vw, 2.2rem); padding-left: 1.2rem; }
-
-            /* STATS */
-            .stats-row { gap: 0.8rem; }
-
-            /* FOOTER */
-            footer { padding: 3.5rem 1.4rem 2rem; }
+            /* ── FOOTER ── */
+            footer { padding: 3rem 1.25rem 2rem; }
             .footer-top { grid-template-columns: 1fr; gap: 2rem; }
+            .footer-logo { font-size: 1.6rem; }
         }
 
+        /* ─── MÓVIL PEQUEÑO (< 400px) ─── */
         @media (max-width: 400px) {
-            .dest-grid { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
-            .dest-card { padding: 1.2rem 0.7rem; }
-            .dest-emoji { width: 48px; height: 48px; }
-            .dest-name { font-size: 0.9rem; }
+            .hero h1 { font-size: clamp(2.2rem, 10vw, 2.8rem); }
+            .dest-grid { gap: 0.5rem; }
+            .dest-card { padding: 1.1rem 0.6rem; }
+            .dest-emoji { width: 44px; height: 44px; }
+            .dest-name { font-size: 0.85rem; }
+            .dest-count { font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -938,50 +1019,78 @@
     <div class="nav-overlay" id="navOverlay"></div>
 
     <script>
+        // ── SCROLL HEADER ──
         const header = document.getElementById('mainHeader');
         window.addEventListener('scroll', () => {
             header.classList.toggle('scrolled', window.scrollY > 60);
         }, { passive: true });
 
+        // ── REVEAL ON SCROLL ──
         const reveals = document.querySelectorAll('.reveal');
         const io = new IntersectionObserver((entries) => {
             entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.08 });
         reveals.forEach(el => io.observe(el));
 
-        // Hamburger menu
-        const hamburger = document.getElementById('hamburger');
-        const navLinks  = document.getElementById('navLinks');
-        const overlay   = document.getElementById('navOverlay');
+        // ── MENÚ HAMBURGUESA ──
+        const hamburger  = document.getElementById('hamburger');
+        const navLinks   = document.getElementById('navLinks');
+        const overlay    = document.getElementById('navOverlay');
 
-        function toggleMenu(open) {
-            hamburger.classList.toggle('open', open);
-            navLinks.classList.toggle('open', open);
-            overlay.classList.toggle('open', open);
-            hamburger.setAttribute('aria-expanded', open);
-            document.body.style.overflow = open ? 'hidden' : '';
+        function openMenu()  {
+            hamburger.classList.add('open');
+            navLinks.classList.add('open');
+            overlay.classList.add('open');
+            hamburger.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMenu() {
+            hamburger.classList.remove('open');
+            navLinks.classList.remove('open');
+            overlay.classList.remove('open');
+            hamburger.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+            // Cerrar también el acordeón si estaba abierto
+            closeDestinos();
         }
 
         hamburger.addEventListener('click', () => {
-            const isOpen = navLinks.classList.contains('open');
-            toggleMenu(!isOpen);
+            navLinks.classList.contains('open') ? closeMenu() : openMenu();
+        });
+        overlay.addEventListener('click', closeMenu);
+
+        // Cerrar al pulsar Escape
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeMenu();
         });
 
-        overlay.addEventListener('click', () => toggleMenu(false));
-
-        // Acordeón de Destinos en móvil
+        // ── ACORDEÓN DESTINOS (solo móvil) ──
         const destinosBtn = document.getElementById('toggleDestinosMobile');
-        const dropdown = document.querySelector('.dropdown');
+        const dropdown    = destinosBtn ? destinosBtn.nextElementSibling : null;
 
-        destinosBtn.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768) {
+        function closeDestinos() {
+            if (!dropdown) return;
+            dropdown.classList.remove('show-mobile');
+            destinosBtn.classList.remove('active');
+        }
+
+        if (destinosBtn && dropdown) {
+            destinosBtn.addEventListener('click', (e) => {
+                if (window.innerWidth > 768) return; // en escritorio, no hacer nada
                 e.preventDefault();
-                dropdown.classList.toggle('show-mobile');
-                destinosBtn.classList.toggle('active');
-            }
-        });
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => toggleMenu(false));
+                const isOpen = dropdown.classList.contains('show-mobile');
+                if (isOpen) {
+                    closeDestinos();
+                } else {
+                    dropdown.classList.add('show-mobile');
+                    destinosBtn.classList.add('active');
+                }
+            });
+        }
+
+        // Cerrar menú al pulsar cualquier enlace real (excluir el botón de Destinos)
+        navLinks.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', closeMenu);
         });
     </script>
 </body>
